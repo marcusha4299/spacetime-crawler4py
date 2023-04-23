@@ -1,10 +1,22 @@
 import re
 from urllib.parse import urlparse
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup
+import requests
 
 def scraper(url, resp):
-    links = extract_next_links(url, resp)
-    return [link for link in links if is_valid(link)]
+    soup = BeautifulSoup(resp.content, 'html.parser')
+    links=[]
+    for link in soup.find_all('a'):
+        href=link.get('href')
+        if href is not None:
+            links.append(href)
+    links=[link for link in links if is_valid(link)]
+    
+    base_url = urlparse(url)
+    links =[base_url.scheme + '://' + base_url.netloc + link if link.startswith('/') else link for link in links]
+    return links
+    #links = extract_next_links(url, resp)
+    #return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -25,6 +37,12 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
+            return False
+        
+        if parsed.netloc not in set (["www.ics.uci.edu",
+                                      "www.cs.uci.edu",
+                                      "www.informatics.uci.edu",
+                                      "www.stat.uci.edu"]):
             return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
