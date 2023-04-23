@@ -1,10 +1,26 @@
 import re
 from urllib.parse import urlparse
+<<<<<<< HEAD
 from urllib.parse import urldefrag
+=======
+from bs4 import BeautifulSoup
+import requests
+>>>>>>> origin
 
 def scraper(url, resp):
-    links = extract_next_links(url, resp)
-    return [link for link in links if is_valid(link)]
+    soup = BeautifulSoup(resp.content, 'html.parser')
+    links=[]
+    for link in soup.find_all('a'):
+        href=link.get('href')
+        if href is not None:
+            links.append(href)
+    links=[link for link in links if is_valid(link)]
+    
+    base_url = urlparse(url)
+    links =[base_url.scheme + '://' + base_url.netloc + link if link.startswith('/') else link for link in links]
+    return links
+    #links = extract_next_links(url, resp)
+    #return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
 
@@ -45,6 +61,7 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         
+<<<<<<< HEAD
         #Checking if the domain names of the URL is consistent with the URLS set in config.ini. If not one of those, return False.
         #if parsed.netloc not in set(["www.ics.uci.edu", "ics.uci.edu",
         #                              "www.cs.uci.edu", "cs.uci.edu",
@@ -52,6 +69,13 @@ def is_valid(url):
         #                                  "www.stat.uci.edu", "stat.uci.edu"]):
         #    return False
         
+=======
+        if parsed.netloc not in set (["www.ics.uci.edu",
+                                      "www.cs.uci.edu",
+                                      "www.informatics.uci.edu",
+                                      "www.stat.uci.edu"]):
+            return False
+>>>>>>> origin
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -65,3 +89,4 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", parsed)
         raise
+#this is for test
