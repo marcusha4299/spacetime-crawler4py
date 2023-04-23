@@ -3,8 +3,11 @@ from urllib.parse import urlparse
 from urllib.parse import urldefrag
 from bs4 import BeautifulSoup
 import requests
+import utils
 
-def scraper(url, resp):
+def scraper (url: str, resp: utils.response.Response) -> list:
+    """
+    #Code adapted from BeautifulSoup website: add website here.
     soup = BeautifulSoup(resp.content, 'html.parser')
     links=[]
     for link in soup.find_all('a'):
@@ -16,8 +19,9 @@ def scraper(url, resp):
     base_url = urlparse(url)
     links =[base_url.scheme + '://' + base_url.netloc + link if link.startswith('/') else link for link in links]
     return links
-    #links = extract_next_links(url, resp)
-    #return [link for link in links if is_valid(link)]
+    """
+    links = extract_next_links(url, resp)
+    return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
 
@@ -25,6 +29,8 @@ def extract_next_links(url, resp):
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
     """
+    Conner added this part. 
+    
     Gets the unfragmented url.
     unfragmentedurl = urldefrag(resp.url)[0]
 
