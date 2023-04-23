@@ -1,11 +1,8 @@
 import re
 from urllib.parse import urlparse
-<<<<<<< HEAD
 from urllib.parse import urldefrag
-=======
 from bs4 import BeautifulSoup
 import requests
->>>>>>> origin
 
 def scraper(url, resp):
     soup = BeautifulSoup(resp.content, 'html.parser')
@@ -61,21 +58,15 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         
-<<<<<<< HEAD
         #Checking if the domain names of the URL is consistent with the URLS set in config.ini. If not one of those, return False.
         #if parsed.netloc not in set(["www.ics.uci.edu", "ics.uci.edu",
         #                              "www.cs.uci.edu", "cs.uci.edu",
         #                                "www.informatics.uci.edu", "informatics.uci.edu",
         #                                  "www.stat.uci.edu", "stat.uci.edu"]):
         #    return False
+
+        #added new code here
         
-=======
-        if parsed.netloc not in set (["www.ics.uci.edu",
-                                      "www.cs.uci.edu",
-                                      "www.informatics.uci.edu",
-                                      "www.stat.uci.edu"]):
-            return False
->>>>>>> origin
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
