@@ -99,3 +99,4 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 #this is for test
+#testing git
