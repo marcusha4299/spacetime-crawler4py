@@ -2,10 +2,9 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urldefrag
 from bs4 import BeautifulSoup
-import requests
-import utils
 
-def scraper (url: str, resp: utils.response.Response) -> list:
+
+def scraper (url, resp):
     """
     #Code adapted from BeautifulSoup website: add website here.
     soup = BeautifulSoup(resp.content, 'html.parser')
@@ -53,7 +52,20 @@ def extract_next_links(url, resp):
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-    return list()
+    
+    #Jay added this part
+    link_list = []
+    unfragmentedurl = urldefrag(resp.url)[0]
+    if is_valid(unfragmentedurl):
+        if resp.status == 200:
+            soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
+            for link in soup.find_all('a'):
+                href=link.get('href')
+                if href is not None:
+                    link_list.append(href) 
+        # else:
+        #     error_message = resp.error
+    return link_list
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -65,11 +77,11 @@ def is_valid(url):
             return False
         
         #Checking if the domain names of the URL is consistent with the URLS set in config.ini. If not one of those, return False.
-        #if parsed.netloc not in set(["www.ics.uci.edu", "ics.uci.edu",
-        #                              "www.cs.uci.edu", "cs.uci.edu",
-        #                                "www.informatics.uci.edu", "informatics.uci.edu",
-        #                                  "www.stat.uci.edu", "stat.uci.edu"]):
-        #    return False
+        if parsed.netloc not in set(["www.ics.uci.edu", "ics.uci.edu",
+                                     "www.cs.uci.edu", "cs.uci.edu",
+                                       "www.informatics.uci.edu", "informatics.uci.edu",
+                                         "www.stat.uci.edu", "stat.uci.edu"]):
+           return False
 
         #added new code here
         
