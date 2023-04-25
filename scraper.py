@@ -2,6 +2,7 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urldefrag
 from bs4 import BeautifulSoup
+import requests
 
 
 def scraper (url, resp):
@@ -19,6 +20,7 @@ def scraper (url, resp):
     links =[base_url.scheme + '://' + base_url.netloc + link if link.startswith('/') else link for link in links]
     return links
     """
+       
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
@@ -32,7 +34,6 @@ def extract_next_links(url, resp):
     
     Gets the unfragmented url.
     unfragmentedurl = urldefrag(resp.url)[0]
-
     if is_valid(resp.url):
        if resp.status == 200:
         #Core of the body works.
