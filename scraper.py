@@ -2,10 +2,9 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urldefrag
 from bs4 import BeautifulSoup
-import requests
-import utils
 
-def scraper (url: str, resp: utils.response.Response) -> list:
+
+def scraper (url, resp):
     """
     #Code adapted from BeautifulSoup website: add website here.
     soup = BeautifulSoup(resp.content, 'html.parser')
