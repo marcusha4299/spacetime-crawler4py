@@ -56,11 +56,23 @@ def extract_next_links(url, resp):
     
     #Jay added this part
     link_list = []
+
+    #Unfrag the url so that we don't run the same webpages.
     unfragmentedurl = urldefrag(resp.url)[0]
+
+    #Check to see if we already ran that url against the list of saved urls.
+
+    #ADD CODE HERE
+
     if is_valid(unfragmentedurl):
+        # Check that the webpage returns an ok 200 response, anything else we ignore (skip).
         if resp.status == 200:
+            #Credit given to the BeautifulSoup library. https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+            #Takes an HTML file and gives us the HTML data from it.
             soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
+            #Finds the links within the HTML document. Uses 'a' to find all the hyperlinks.
             for link in soup.find_all('a'):
+                #Makes the HTML link into a usable string.
                 href=link.get('href')
                 if href is not None:
                     link_list.append(href) 
