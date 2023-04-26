@@ -9,6 +9,7 @@ def scraper(url, resp):
     return [link for link in links if is_valid(link)]
 
 
+<<<<<<< HEAD
 def extract_next_links(url, resp) -> list:
     # resp is pages content (in html)
     result_next_links = list()
@@ -37,6 +38,61 @@ def extract_next_links(url, resp) -> list:
                 print(i)
     return result_next_links
 
+=======
+    # Implementation required.
+    # url: the URL that was used to get the page
+    # resp.url: the actual url of the page
+    """
+    Conner added this part. 
+    
+    Gets the unfragmented url.
+    unfragmentedurl = urldefrag(resp.url)[0]
+    if is_valid(resp.url):
+       if resp.status == 200:
+        #Core of the body works.
+        
+        #Check to see if core of body is "empty". 
+            #IF empty, skip.
+            #Else go through it.
+    
+        else:
+            error_message = resp.error
+    """
+    
+   
+    # resp.status: the status code returned by the server. 200 is OK, you got the page. Other numbers mean that there was some kind of problem.
+    # resp.error: when status is not 200, you can check the error here, if needed.
+    # resp.raw_response: this is where the page actually is. More specifically, the raw_response has two parts:
+    #         resp.raw_response.url: the url, again
+    #         resp.raw_response.content: the content of the page!
+    # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
+    
+    #Jay added this part
+    link_list = []
+
+    #Unfrag the url so that we don't run the same webpages.
+    unfragmentedurl = urldefrag(resp.url)[0]
+
+    #Check to see if we already ran that url against the list of saved urls.
+
+    #ADD CODE HERE
+
+    if is_valid(unfragmentedurl):
+        # Check that the webpage returns an ok 200 response, anything else we ignore (skip).
+        if resp.status == 200:
+            #Credit given to the BeautifulSoup library. https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+            #Takes an HTML file and gives us the HTML data from it.
+            soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
+            #Finds the links within the HTML document. Uses 'a' to find all the hyperlinks.
+            for link in soup.find_all('a'):
+                #Makes the HTML link into a usable string.
+                href=link.get('href')
+                if href is not None:
+                    link_list.append(href) 
+        # else:
+        #     error_message = resp.error
+    return link_list
+>>>>>>> refs/remotes/origin/master
 
 def is_valid(url):
     try:
