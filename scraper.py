@@ -1,44 +1,31 @@
 import re
 from urllib.parse import urlparse
-from lxml import html, etree
+from urllib.parse import urldefrag
+from bs4 import BeautifulSoup
 import requests
 
 
-def scraper(url, resp):
+def scraper (url, resp):
+    """
+    #Code adapted from BeautifulSoup website: add website here.
+    soup = BeautifulSoup(resp.content, 'html.parser')
+    links=[]
+    for link in soup.find_all('a'):
+        href=link.get('href')
+        if href is not None:
+            links.append(href)
+    links=[link for link in links if is_valid(link)]
+    
+    base_url = urlparse(url)
+    links =[base_url.scheme + '://' + base_url.netloc + link if link.startswith('/') else link for link in links]
+    return links
+    """
+       
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
+def extract_next_links(url, resp):
 
-<<<<<<< HEAD
-def extract_next_links(url, resp) -> list:
-    # resp is pages content (in html)
-    result_next_links = list()
-    html_content = None
-    try:
-        # make sure the page exists
-        if resp.raw_response is not None:
-            # ------- NOTE: got html file of curr doc using lxml document_fromstring -----
-            html_content = html.document_fromstring(resp.raw_response.text)
-            # make links absolute
-            html_content.make_links_absolute(url, resolve_base_href=True)
-    # ----------NOTE: order matters bc Parse Error is super class of XML syntax error --------
-    except etree.XMLSyntaxError:
-        print("Xml error, COULD NOT EXTRACT LINKS FROM URL: " + url)
-        pass
-    except etree.ParseError:
-        print("Parser error, COULD NOT EXTRACT LINKS FROM URL: " + url)
-        pass
-    # ------- NOTE: links on curr doc using lxml iterlinks()[2] ----------
-    # add unique extracted links to the list
-    if html_content is not None:
-        for i in html_content.iterlinks():
-            # makes sure url is not extracting link to current url
-            if i[2] != url:
-                result_next_links.append(i[2])
-                print(i)
-    return result_next_links
-
-=======
     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
@@ -92,50 +79,25 @@ def extract_next_links(url, resp) -> list:
         # else:
         #     error_message = resp.error
     return link_list
->>>>>>> refs/remotes/origin/master
 
 def is_valid(url):
+    # Decide whether to crawl this url or not. 
+    # If you decide to crawl it, return True; otherwise return False.
+    # There are already some conditions that return False.
     try:
-        traps = ['calendar', 'calendar-feed', 'BadContent']
         parsed = urlparse(url)
-
-        # The URL must be in http or https
         if parsed.scheme not in set(["http", "https"]):
             return False
+        
+        #Checking if the domain names of the URL is consistent with the URLS set in config.ini. If not one of those, return False.
+        if parsed.netloc not in set(["www.ics.uci.edu", "ics.uci.edu",
+                                     "www.cs.uci.edu", "cs.uci.edu",
+                                       "www.informatics.uci.edu", "informatics.uci.edu",
+                                         "www.stat.uci.edu", "stat.uci.edu"]):
+           return False
 
-        # The max length of a URL in the address bar is 2048 characters
-        if len(url) > 2048:
-            return False
-
-        # Do not include queries, due to causing infinite requests
-        if parsed.query != '':
-            return False
-
-        # URL must be within the specified domains and paths
-        if parsed.netloc[4:] not in {"stat.uci.edu", "ics.uci.edu", "informatics.uci.edu", "cs.uci.edu"} \
-                and parsed.netloc not in {"today.uci.edu/department/information_computer_sciences"}:
-            return False
-
-        # Do not include fragments
-        if parsed.fragment != '':
-            return False
-
-        # make sure not extracting pages with request errors
-        if requests.get(url, timeout=300).status_code not in range(200, 399):
-            return False
-
-        # Do not include endless loops EXAMPLE: https://ics.uci.edu/a/a/a/a/a/a/a/a/a/a/a/a/a
-        # ------- NOTE: I used "\w" to catch first group of chars of (length between 1 to inf),
-        #               then compare next non capturing group with that first group by using "\1"
-        #               Only a match if 2 or more non capturing groups matches that first group.
-        #               Repeat for each group. EXAMPLE OF MATCH: /foo/bar/aba/aba/aba -------------------
-        if re.match(r"(\w+)(?:\W+\1){2,}", parsed.path.lower()):
-            return False
-
-        # check for well known traps, such as calendars.
-        if any(trap in url for trap in traps):
-            return False
-
+        #added new code here
+        
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -146,12 +108,9 @@ def is_valid(url):
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
 
-    # implementing a timeout to detect and avoid stalling
-    except TimeoutError:
-        # stalling too long. took longer than 5 minutes
-        print("TimeoutError for ", parsed)
-        return False
-
     except TypeError:
-        print("TypeError for ", parsed)
+        print ("TypeError for ", parsed)
         raise
+#this is for test
+#testing git
+#testing git 2
