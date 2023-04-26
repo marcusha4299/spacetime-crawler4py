@@ -22,6 +22,11 @@ class Worker(Thread):
             tbd_url = self.frontier.get_tbd_url()
             if not tbd_url:
                 self.logger.info("Frontier is empty. Stopping Crawler.")
+                #Print logged info here. 
+                #Ex:  List of words (50 most common)
+                #Ex: # of unique pages
+                #Ex: Longest page # in terms of words
+                #Ex: ICS subdomains, listed alphabetically
                 break
             resp = download(tbd_url, self.config, self.logger)
             self.logger.info(
