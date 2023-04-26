@@ -2,7 +2,6 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urldefrag
 from bs4 import BeautifulSoup
-import requests
 
 
 def scraper (url, resp):
