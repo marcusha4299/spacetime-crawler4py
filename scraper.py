@@ -39,7 +39,6 @@ def scraper (url, resp):
                 if url not in self.urlDict:
                     self.urlDict[url] = 1
         
-
     """
        
     links = extract_next_links(url, resp)
@@ -171,3 +170,4 @@ def is_valid(url):
 #this is for test
 #testing git
 #testing git 2
+#testing git 3
