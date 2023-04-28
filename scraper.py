@@ -66,61 +66,59 @@ def extract_next_links(url, resp):
 
 
     if is_valid(unfragmentedurl):
-        #Parses the url, useful for the ICS portion.
-        urlResponse = urlparse(unfragmentedurl)
-        #Deals with the portion of collecting ICS pages specifically for this assignment
-        
-        #Seperate check and add to the ICS dicitonary, useful for question #4 in the response.
-        if ".ics.uci.edu" in urlResponse.netloc:
-            #Check if it already exists in the ICS dictionary
-            #If it exists, add to the key + 1
-            if (urlResponse.scheme + "." + urlResponse.netloc) in global_icsLink_dictionary:
-                global_icsLink_dictionary[(urlResponse.scheme + "." + urlResponse.netloc)] += 1
-            #If it doesn't exist, create one, and set the key value to 1
-            else:
-                global_icsLink_dictionary[(urlResponse.scheme + "." + urlResponse.netloc)] = 1
-
         #Check that we haven't already ran that link (checks if its in the dictionary)
-        if unfragmentedurl not in global_linkNumWords_dictionary:
-            # Check that the webpage returns an ok 200 response, anything else we ignore (skip).
-            if resp.status == 200:
-                #Credit given to the BeautifulSoup library. https://www.crummy.com/software/BeautifulSoup/bs4/doc/
-                #Takes an HTML file and gives us the HTML data from it.
-                soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
+        # if unfragmentedurl not in global_linkNumWords_dictionary:
+        # Check that the webpage returns an ok 200 response, anything else we ignore (skip).
+        if resp.status == 200:
+            #Credit given to the BeautifulSoup library. https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+            #Takes an HTML file and gives us the HTML data from it.
+            soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
+            #Grabs the text within the URL
+            text_string = soup.get_text()           
+            #Gets rid of " 's " in words
+            remove_apos_text_string = re.sub(r"'s", " ", text_string)
+            #Gets rid of all "bad input" except for apostrophes (not 's)
+            updated_text_string = re.sub("[^a-zA-Z0-9']", " ", remove_apos_text_string)
+            list_of_words = updated_text_string.split()
 
+            #If the webpage has more than 99 words, we consider it having more than "little information" (run through it)
+            #Additionally, if a webpage is very large (larger than 10 MB for our definition, must make an assumption of how many words that is)
+            if len(list_of_words) > 99 and len(list_of_words) < 159000:
+                lowerList_of_words = [eachIndex.lower() for eachIndex in list_of_words]
+                #Add list of words to the dictionary
+                for eachWord in lowerList_of_words:
+                    #Check if the token is not in the stop words list
+                    if eachWord not in global_stopWords:
+                        #Check if the token is already in the dictionary.
+                        if eachWord in global_words_dictionary:
+                            #If it exists, update the value by 1
+                            global_words_dictionary[eachWord] += 1
+                        else:
+                            #If it does not exist, create a new key to tokenize the word
+                            global_words_dictionary[eachWord] = 1
+
+                #After all the checks, add the URl to the dictionary of Links -> num words
+                global_linkNumWords_dictionary[unfragmentedurl] = len(list_of_words)
+                #Parses the url, useful for the ICS portion.
+                urlResponse = urlparse(unfragmentedurl)
+                #Deals with the portion of collecting ICS pages specifically for this assignment
+                
+                if ".ics.uci.edu" in urlResponse.netloc:
+                    #Check if it already exists in the ICS dictionary
+                    #If it exists, add to the key + 1
+                    if (urlResponse.scheme + urlResponse.netloc) in global_icsLink_dictionary:
+                        global_icsLink_dictionary[(urlResponse.scheme + urlResponse.netloc)] += 1
+                    #If it doesn't exist, create one, and set the key value to 1
+                    else:
+                        global_icsLink_dictionary[(urlResponse.scheme + urlResponse.netloc)] = 1
+                
                 #Finds the links within the HTML document. Uses 'a' to find all the hyperlinks.
                 for link in soup.find_all('a'):
                     #Makes the HTML link into a usable string.
                     href=link.get('href')
                     if href is not None:
-                        link_list.append(href) 
-                
-                #Grabs the text within the URL
-                text_string = soup.get_text()           
-                #Gets rid of " 's " in words
-                remove_apos_text_string = re.sub(r"'s", " ", text_string)
-                #Gets rid of all "bad input" except for apostrophes (not 's)
-                updated_text_string = re.sub("[^a-zA-Z0-9']", " ", remove_apos_text_string)
-                list_of_words = updated_text_string.split()
-
-                #If the webpage has more than 99 words, we consider it having more than "little information" (run through it)
-                #Additionally, if a webpage is very large (larger than 10 MB for our definition, must make an assumption of how many words that is)
-                if len(list_of_words) > 99 and len(list_of_words) < 159000:
-                    lowerList_of_words = [eachIndex.lower() for eachIndex in list_of_words]
-                    #Add list of words to the dictionary
-                    for eachWord in lowerList_of_words:
-                        #Check if the token is not in the stop words list
-                        if eachWord not in global_stopWords:
-                            #Check if the token is already in the dictionary.
-                            if eachWord in global_words_dictionary:
-                                #If it exists, update the value by 1
-                                global_words_dictionary[eachWord] += 1
-                            else:
-                                #If it does not exist, create a new key to tokenize the word
-                                global_words_dictionary[eachWord] = 1
-
-                #After all the checks, add the URl to the dictionary of Links -> num words
-                global_linkNumWords_dictionary[unfragmentedurl] = len(list_of_words)
+                        unfragmentedLink = urldefrag(href)[0]
+                        link_list.append(unfragmentedLink)
             
 
 
@@ -145,8 +143,8 @@ def is_valid(url):
         if re.search(
             r"(/css/|/js/|/bmp/|/gif/|/jpe?g/|/ico/"
             + r"|/png/|/tiff?/|/mid/|/mp2/|/mp3/|/mp4/"
-            + r"|/wav/|/avi/|/mov/|/mpeg/|/ram/|/m4v/|/mkv/|/ogg/|/ogv/|/pdf/|/odc/|/wp-content/"
-            + r"|/ps/|/eps/|/tex/|/ppt/|/pptx/|/doc/|/docx/|/xls/|/xlsx/|/names/"
+            + r"|/wav/|/avi/|/mov/|/mpeg/|/ram/|/m4v/|/mkv/|/ogg/|/ogv/|/pdf/|/odc/|/wp-content/|/ppsx/"
+            + r"|/ps/|/eps/|/tex/|/ppt/|/pptx/|/doc/|/docx/|/xls/|/xlsx/|/names/|/jpg/|jpeg"
             + r"|/data/|/dat/|/exe/|/bz2/|/tar/|/msi/|/bin/|/7z/|/psd/|/dmg/|/iso/"
             + r"|/epub/|/dll/|/cnf/|/tgz/|/sha1/"
             + r"|/thmx/|/mso/|/arff/|/rtf/|/jar/|/csv/"
@@ -157,8 +155,8 @@ def is_valid(url):
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
-            + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf|odc|wp-content"
-            + r"|ps|eps|tex|ppt|pptx|ppsx|doc|docx|xls|xlsx|names"
+            + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf|odc|wp-content|ppsx|jpg|jpeg"
+            + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
