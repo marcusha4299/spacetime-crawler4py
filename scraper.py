@@ -10,7 +10,7 @@ global_linkNumWords_dictionary = dict()
 #Dictionary containing all the ics subdomains and how many times they were called EX: vision.ics.uci.edu -> 10
 global_icsLink_dictionary = dict()
 #Set of global stopwords to avoid.
-global_stopWords = set("a", "about", "above", "after", "again",
+global_stopWords = {"a", "about", "above", "after", "again",
                 "against", "all", "am", "an", "and",
                 "any", "are", "aren't", "as", "at",
                 "be", "because", "been", "before", "being",
@@ -30,7 +30,7 @@ global_stopWords = set("a", "about", "above", "after", "again",
                 "too", "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", 
                 "we've", "were", "weren't", "what", "what's", "when", "when's", "where", "where's", 
                 "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", 
-                "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves")
+                "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"}
 
 def scraper (url, resp):
     """    
@@ -91,21 +91,19 @@ def extract_next_links(url, resp):
                 lowerList_of_words = [eachIndex.lower() for eachIndex in list_of_words]
                 #Add list of words to the dictionary
                 for eachWord in lowerList_of_words:
-                    #Check if the token is already in the dictionary.
-                    if eachWord in global_words_dictionary:
-                        #If it exists, update the value by 1
-                        global_words_dictionary[eachWord] += 1
-                    else:
-                        #If it does not exist, create a new key to tokenize the word
-                        global_words_dictionary[eachWord] = 1
+                    #Check if the token is not in the stop words list
+                    if eachWord not in global_stopWords:
+                        #Check if the token is already in the dictionary.
+                        if eachWord in global_words_dictionary:
+                            #If it exists, update the value by 1
+                            global_words_dictionary[eachWord] += 1
+                        else:
+                            #If it does not exist, create a new key to tokenize the word
+                            global_words_dictionary[eachWord] = 1
+                #print(global_words_dictionary)
 
-
-
-    #Returns a nested link list so we can gather the word information later.
+    #Returns a list of links to be parsed/crawled later.
     return link_list
-
-
-    # List [[data], linka, linkb, linkc]
 
 
 def is_valid(url):
@@ -117,23 +115,12 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         
-        #Keeping temporarily until below code works.
-        """#Checking if the domain names of the URL is consistent with the URLS set in config.ini. If not one of those, return False.
-        if parsed.netloc not in set(["www.ics.uci.edu", "ics.uci.edu",
-                                     "www.cs.uci.edu", "cs.uci.edu",
-                                       "www.informatics.uci.edu", "informatics.uci.edu",
-                                         "www.stat.uci.edu", "stat.uci.edu"]):
-           return False"""
-
         #Checking if the domain names of the URL is consistent with the URLS set in config.ini. If not one of those, return False.
-        if not parsed.netloc.contains(".ics.uci.edu" or 
-                                      ".cs.uci.edu" or 
-                                      ".informatics.uci.edu" or
-                                      ".stat.uci.edu"):
+        if (".ics.uci.edu" or ".cs.uci.edu" or ".informatics.uci.edu" or ".stat.uci.edu") not in parsed.netloc:
             return False
 
 
-        #added new code here
+        
         
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
