@@ -22,11 +22,39 @@ class Worker(Thread):
             tbd_url = self.frontier.get_tbd_url()
             if not tbd_url:
                 self.logger.info("Frontier is empty. Stopping Crawler.")
-                #Print logged info here. 
-                #Ex:  List of words (50 most common)
-                #Ex: # of unique pages
-                #Ex: Longest page # in terms of words
-                #Ex: ICS subdomains, listed alphabetically
+
+                #An Empty Text file that can save the results that we gained when we run.
+                textFile = open("reports.txt", "w")
+
+                #Adds all the results to the text file, used in the report later.
+
+                #Answers #1 -> Print number of unique pages
+                print("# of unique pages: " + len(scraper.global_linkNumWords_dictionary))
+                textFile.write("# of unique pages: " + str(len(scraper.global_linkNumWords_dictionary)) + "\n")
+
+                #Answers #2 -> Longest page in terms of num of words
+                #Sorts the dictionary based on the largest value (aka # of words), and we grab the first item (highest value)
+                longestPage = sorted(scraper.global_linkNumWords_dictionary.items(), key = lambda item: (-item[1]))[0][0]
+                print("Page with longest number of words: "  + longestPage + "\n")
+                textFile.write("Page with longest number of words: "  + str(longestPage) + "\n")
+
+                #Answers #3 -> 50 most common words in the links
+                #Sorts based on the freq of the word (how many times its there)
+                firstFiftyWords = sorted(scraper.global_words_dictionary.items(), key = lambda item: (-item[1]))[:50]
+                for eachWord in firstFiftyWords:
+                    print("Word: " + firstFiftyWords[0] + "    Count: " + firstFiftyWords[1])
+                    textFile.write("Word: " + firstFiftyWords[0] + "    Count: " + str(firstFiftyWords[1]) + "\n")
+
+                #Answers #4 -> Unique ics subdomains, listed alphabetically
+                #Sorts them alphabetically based on the link
+                icsSubdomains = sorted(scraper.global_icsLink_dictionary.items(), key = lambda item: (item[0]))
+                for eachLink in icsSubdomains:
+                    textFile.write("Link: " + icsSubdomains[0] + "    Count: " + str(icsSubdomains[1]))
+
+                #Closes the file
+                textFile.close()
+
+                #Ends the run
                 break
             resp = download(tbd_url, self.config, self.logger)
             self.logger.info(
