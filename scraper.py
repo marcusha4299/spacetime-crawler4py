@@ -107,11 +107,11 @@ def extract_next_links(url, resp):
                 if ".ics.uci.edu" in urlResponse.netloc:
                     #Check if it already exists in the ICS dictionary
                     #If it exists, add to the key + 1
-                    if (urlResponse.scheme + "://." + urlResponse.netloc) in global_icsLink_dictionary:
-                        global_icsLink_dictionary[(urlResponse.scheme + "://." + urlResponse.netloc)] += 1
+                    if (urlResponse.scheme + "://" + urlResponse.netloc) in global_icsLink_dictionary:
+                        global_icsLink_dictionary[(urlResponse.scheme + "://" + urlResponse.netloc)] += 1
                     #If it doesn't exist, create one, and set the key value to 1
                     else:
-                        global_icsLink_dictionary[(urlResponse.scheme + "://." + urlResponse.netloc)] = 1
+                        global_icsLink_dictionary[(urlResponse.scheme + "://" + urlResponse.netloc)] = 1
                 
                 #Finds the links within the HTML document. Uses 'a' to find all the hyperlinks.
                 for link in soup.find_all('a'):
