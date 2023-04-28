@@ -79,7 +79,7 @@ def extract_next_links(url, resp):
             #Gets rid of " 's " in words
             remove_apos_text_string = re.sub(r"'s", " ", text_string)
             #Gets rid of all "bad input" except for apostrophes (not 's)
-            updated_text_string = re.sub("[^a-zA-Z0-9']", " ", remove_apos_text_string)
+            updated_text_string = re.sub("[^a-zA-Z']", " ", remove_apos_text_string)
             list_of_words = updated_text_string.split()
 
             #If the webpage has more than 99 words, we consider it having more than "little information" (run through it)
