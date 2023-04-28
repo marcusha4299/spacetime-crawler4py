@@ -70,14 +70,15 @@ def extract_next_links(url, resp):
         urlResponse = urlparse(unfragmentedurl)
         #Deals with the portion of collecting ICS pages specifically for this assignment
         
+        #Seperate check and add to the ICS dicitonary, useful for question #4 in the response.
         if ".ics.uci.edu" in urlResponse.netloc:
             #Check if it already exists in the ICS dictionary
             #If it exists, add to the key + 1
-            if (urlResponse.scheme + urlResponse.netloc) in global_icsLink_dictionary:
-                global_icsLink_dictionary[(urlResponse.scheme + urlResponse.netloc)] += 1
+            if (urlResponse.scheme + "." + urlResponse.netloc) in global_icsLink_dictionary:
+                global_icsLink_dictionary[(urlResponse.scheme + "." + urlResponse.netloc)] += 1
             #If it doesn't exist, create one, and set the key value to 1
             else:
-                global_icsLink_dictionary[(urlResponse.scheme + urlResponse.netloc)] = 1
+                global_icsLink_dictionary[(urlResponse.scheme + "." + urlResponse.netloc)] = 1
 
         #Check that we haven't already ran that link (checks if its in the dictionary)
         if unfragmentedurl not in global_linkNumWords_dictionary:
