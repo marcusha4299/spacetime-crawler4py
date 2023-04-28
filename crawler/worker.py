@@ -42,14 +42,14 @@ class Worker(Thread):
                 #Sorts based on the freq of the word (how many times its there)
                 firstFiftyWords = sorted(scraper.global_words_dictionary.items(), key = lambda item: (-item[1]))[:50]
                 for eachWord in firstFiftyWords:
-                    print("Word: " + str(firstFiftyWords[0]) + "    Count: " + str(firstFiftyWords[1]))
-                    textFile.write("Word: " + str(firstFiftyWords[0]) + "    Count: " + str(firstFiftyWords[1]) + "\n")
+                    print("Word: " + str(eachWord[0]) + "    Count: " + str(eachWord[1]))
+                    textFile.write("Word: " + str(eachWord[0]) + "    Count: " + str(eachWord[1]) + "\n")
 
                 #Answers #4 -> Unique ics subdomains, listed alphabetically
                 #Sorts them alphabetically based on the link
                 icsSubdomains = sorted(scraper.global_icsLink_dictionary.items(), key = lambda item: (item[0]))
                 for eachLink in icsSubdomains:
-                    textFile.write("Link: " + str(icsSubdomains[0]) + "    Count: " + str(icsSubdomains[1]))
+                    textFile.write("Link: " + str(eachLink[0]) + "    Count: " + str(eachLink[1] + "\n"))
 
                 #Closes the file
                 textFile.close()
