@@ -55,6 +55,7 @@ def extract_next_links(url, resp):
     # resp.raw_response: this is where the page actually is. More specifically, the raw_response has two parts:
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
+    
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     
     link_list = []
@@ -87,8 +88,8 @@ def extract_next_links(url, resp):
                 lowerList_of_words = [eachIndex.lower() for eachIndex in list_of_words]
                 #Add list of words to the dictionary
                 for eachWord in lowerList_of_words:
-                    #Check if the token is not in the stop words list
-                    if eachWord not in global_stopWords:
+                    #Check if the token is not in the stop words list or is greater than length 1 (useless info from 1 letter/num)
+                    if (eachWord not in global_stopWords) and (len(eachWord) > 1):
                         #Check if the token is already in the dictionary.
                         if eachWord in global_words_dictionary:
                             #If it exists, update the value by 1
@@ -106,11 +107,11 @@ def extract_next_links(url, resp):
                 if ".ics.uci.edu" in urlResponse.netloc:
                     #Check if it already exists in the ICS dictionary
                     #If it exists, add to the key + 1
-                    if (urlResponse.scheme + urlResponse.netloc) in global_icsLink_dictionary:
-                        global_icsLink_dictionary[(urlResponse.scheme + urlResponse.netloc)] += 1
+                    if (urlResponse.scheme + "://." + urlResponse.netloc) in global_icsLink_dictionary:
+                        global_icsLink_dictionary[(urlResponse.scheme + "://." + urlResponse.netloc)] += 1
                     #If it doesn't exist, create one, and set the key value to 1
                     else:
-                        global_icsLink_dictionary[(urlResponse.scheme + urlResponse.netloc)] = 1
+                        global_icsLink_dictionary[(urlResponse.scheme + "://." + urlResponse.netloc)] = 1
                 
                 #Finds the links within the HTML document. Uses 'a' to find all the hyperlinks.
                 for link in soup.find_all('a'):
