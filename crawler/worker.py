@@ -29,8 +29,8 @@ class Worker(Thread):
                 #Adds all the results to the text file, used in the report later.
 
                 #Answers #1 -> Print number of unique pages
-                print("# of unique pages: " + str(len(scraper.global_linkNumWords_dictionary)))
-                textFile.write("# of unique pages: " + str(len(scraper.global_linkNumWords_dictionary)) + "\n")
+                print("# of unique pages: " + str(len(scraper.global_linkNumWords_dictionary)+len(scraper.global_badLinks_dictionary)))
+                textFile.write("# of unique pages: " + str(len(scraper.global_linkNumWords_dictionary)+len(scraper.global_badLinks_dictionary)) + "\n")
 
                 #Answers #2 -> Longest page in terms of num of words
                 #Sorts the dictionary based on the largest value (aka # of words), and we grab the first item (highest value)
@@ -56,7 +56,8 @@ class Worker(Thread):
 
                 #Ends the run
                 break
-            if tbd_url not in scraper.global_linkNumWords_dictionary:
+            #Download the url and run scraper function if the url is unique
+            if tbd_url not in scraper.global_linkNumWords_dictionary and tbd_url not in scraper.global_badLinks_dictionary:
                 resp = download(tbd_url, self.config, self.logger)
                 self.logger.info(
                     f"Downloaded {tbd_url}, status <{resp.status}>, "

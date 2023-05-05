@@ -9,6 +9,8 @@ global_words_dictionary = dict()
 global_linkNumWords_dictionary = dict()
 #Dictionary containing all the ics subdomains and how many times they were called EX: vision.ics.uci.edu -> 10
 global_icsLink_dictionary = dict()
+#Dictionary containing all ics links with status not 200
+global_badLinks_dictionary = dict()
 #Set of global stopwords to avoid.
 global_stopWords = {"a", "about", "above", "after", "again",
                 "against", "all", "am", "an", "and",
@@ -37,10 +39,9 @@ def scraper (url, resp):
             #Add urls to a URL dictionary here
             for url in scraped_urls:
                 if url not in self.urlDict:
-                    self.urlDict[url] = 1
-        
+                    self.urlDict[url] = 1       
     """
-       
+     
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
@@ -56,7 +57,8 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-    
+
+    #Create a list to store links
     link_list = []
 
     #Unfrag the url so that we don't run the same webpages (Gets rid of the #aaaa #bbbb etc.)
@@ -66,15 +68,16 @@ def extract_next_links(url, resp):
 
 
     if is_valid(unfragmentedurl):
-        #Check that we haven't already ran that link (checks if its in the dictionary)
-        # if unfragmentedurl not in global_linkNumWords_dictionary:
-        # Check that the webpage returns an ok 200 response, anything else we ignore (skip).
-        if resp.status == 200:
+        #If webpage is not 200 response, add into global_badLinks_dictionary
+        if resp.status != 200:
+            global_badLinks_dictionary[unfragmentedurl] = 1
+        #Check that the webpage returns an ok 200 response
+        else:
             #Credit given to the BeautifulSoup library. https://www.crummy.com/software/BeautifulSoup/bs4/doc/
             #Takes an HTML file and gives us the HTML data from it.
             soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
             #Grabs the text within the URL
-            text_string = soup.get_text()           
+            text_string = soup.get_text()
             #Gets rid of " 's " in words
             remove_apos_text_string = re.sub(r"'s", " ", text_string)
             #Gets rid of all "bad input" except for apostrophes (not 's)
@@ -162,12 +165,7 @@ def is_valid(url):
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
     
-    # *.jpeg
 
     except TypeError:
         print ("TypeError for ", parsed)
         raise
-#this is for test
-#testing git
-#testing git 2
-#testing git 3
